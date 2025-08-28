@@ -76,55 +76,55 @@ namespace reactCoreVite.Server.Controllers
             });
         }
 
-        /// <summary>
-        /// Create New User
-        /// </summary>
-        [HttpPost("newusercreate")]   //Correct API route
-        public async Task<IActionResult> NewUserCreate([FromBody] UserModel model)
-        {
-            if (model == null)
-            {
-                return BadRequest(new
-                {
-                    messagecode = "400",
-                    message = "Invalid request"
-                });
-            }
+        ///// <summary>
+        ///// Create New User
+        ///// </summary>
+        //[HttpPost("newusercreate")]   //Correct API route
+        //public async Task<IActionResult> NewUserCreate([FromBody] UserModel model)
+        //{
+        //    if (model == null)
+        //    {
+        //        return BadRequest(new
+        //        {
+        //            messagecode = "400",
+        //            message = "Invalid request"
+        //        });
+        //    }
 
-            var objModel = new UserModel
-            {
-                USERNAME = model.USERNAME,
-                EMAIL = model.EMAIL,
-                MOBILE_NUMBER = model.MOBILE_NUMBER,
-                AADHAR_NUMBER = model.AADHAR_NUMBER,
-                ADDRESS = model.ADDRESS,
-                ISACTIVE = 1,
-                CREATEDAT = DateTime.UtcNow,
-                UPDATEDAT = DateTime.UtcNow,
-                USERROLEID = model.USERROLEID,
-            };
+        //    var objModel = new UserModel
+        //    {
+        //        USERNAME = model.USERNAME,
+        //        EMAIL = model.EMAIL,
+        //        MOBILE_NUMBER = model.MOBILE_NUMBER,
+        //        AADHAR_NUMBER = model.AADHAR_NUMBER,
+        //        ADDRESS = model.ADDRESS,
+        //        ISACTIVE = 1,
+        //        CREATEDAT = DateTime.UtcNow,
+        //        UPDATEDAT = DateTime.UtcNow,
+        //        USERROLEID = model.USERROLEID,
+        //    };
 
-            // Hash password securely
-            objModel.PASSWORDHASH = _passwordHasher.HashPassword(objModel, model.PASSWORDHASH);
+        //    // Hash password securely
+        //    objModel.PASSWORDHASH = _passwordHasher.HashPassword(objModel, model.PASSWORDHASH);
 
-            int newUserId = await _userRepository.InsertOrUpdateUserAsync(objModel);
+        //    int newUserId = await _userRepository.InsertOrUpdateUserAsync(objModel);
 
-            if (newUserId <= 0)
-            {
-                return StatusCode(500, new
-                {
-                    messagecode = "500",
-                    message = "User creation failed"
-                });
-            }
+        //    if (newUserId <= 0)
+        //    {
+        //        return StatusCode(500, new
+        //        {
+        //            messagecode = "500",
+        //            message = "User creation failed"
+        //        });
+        //    }
 
-            return Ok(new
-            {
-                messagecode = "200",
-                message = "User created successfully 🎉",
-                userid = newUserId,
-                data = objModel
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        messagecode = "200",
+        //        message = "User created successfully 🎉",
+        //        userid = newUserId,
+        //        data = objModel
+        //    });
+        //}
     }
 }
