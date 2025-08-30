@@ -1,14 +1,14 @@
-﻿using InventorySystem.Data;
-using InventorySystem.QueryRepository;
+﻿using InventorySystem.Common;
+using InventorySystem.Data;
 using InventorySystem.Interface;
+using InventorySystem.QueryRepository;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using static InventorySystem.Model.AccountModel;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Read base path (virtual directory) from appsettings.json
-var basePath = builder.Configuration["AppSettings:SwaggerBasePath"] ?? "";
 
 // Add services to the container
 builder.Services.AddControllers()
@@ -24,9 +24,9 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
-        Title = "My API",
+        Title = "API",
         Version = "v1",
-        Description = "My Inventory System API"
+        Description = "Inventory System API"
     });
 });
 
@@ -37,7 +37,7 @@ builder.Services.AddScoped<IDbConnectionFactory>(sp =>
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
         policy.AllowAnyOrigin()
               .AllowAnyHeader()
@@ -48,37 +48,31 @@ builder.Services.AddCors(options =>
 // Register repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-// Access configuration
-IConfiguration configuration = builder.Configuration;
+// Register password hasher
+builder.Services.AddScoped<IPasswordHasher<UserModel>, PasswordHasher<UserModel>>();
+
+// (Optional) Register your Email service if used
+builder.Services.AddScoped<InventorySystem.Common.IEmailService, EmailService>();
 
 var app = builder.Build();
-
-// Use PathBase if deploying under a virtual directory
-if (!string.IsNullOrEmpty(basePath))
-{
-    app.UsePathBase(basePath);
-}
 
 // Middleware order matters!
 app.UseHttpsRedirection();
 
-app.UseCors();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
-
-// Serve React static files
-app.UseDefaultFiles();
-app.UseStaticFiles();
 
 // Swagger middlewares
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    // Ensure basePath is trimmed of trailing slashes
-    var swaggerBasePath = basePath.TrimEnd('/');
-
-    c.SwaggerEndpoint($"{swaggerBasePath}/swagger/v1/swagger.json", "My API V1");
-    c.RoutePrefix = "swagger"; // URL: /<basePath>/swagger
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Inventory System API V1");
+    c.RoutePrefix = "swagger"; // URL: /swagger
 });
 
 // Map API Controllers

@@ -3,7 +3,7 @@ import { Row, Col, Card, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 import swal from 'sweetalert';
 import { useNavigate } from 'react-router-dom'; // you missed this
-var APIURL = 'http://localhost:5055';
+var APIURL = 'http://localhost:7270';
 const AddNewUser = () => {
   
     const [email, setEmail] = useState('');
@@ -33,15 +33,14 @@ const AddNewUser = () => {
         }
 
         try {
-            const response = await axios.post(APIURL+'/api/auth/newusercreate', {
+            const response = await axios.post(APIURL +'/api/Auth/newusercreate', {
                 EMAIL: email,
                 PASSWORDHASH: password,
                 USERNAME: username,
                 MOBILE_NUMBER: mobileNumber,
                 AADHAR_NUMBER: aadharNumber,
                 ADDRESS: address,
-                ISACTIVE: 1,
-                USERROLEID: userRoleId
+                ISACTIVE: 1
             });
 
             const result = response.data;

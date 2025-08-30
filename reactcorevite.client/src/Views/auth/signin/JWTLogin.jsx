@@ -1,16 +1,15 @@
-/************************************************************************** */
-/* useState - geting the data from input field */
-
+﻿/************************************************************************** */
+/* useState - getting the data from input field */
 /************************************************************************** */
 import React, { useState } from 'react';
 import { Row, Col, Alert, Button } from 'react-bootstrap';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';//3rd porty api calling from React to Assp.net Core
-import swal from 'sweetalert'; //
-//import APIUrl from ''; //API Url
-var APIURL = 'http://localhost:5055';
+import axios from 'axios'; // API calling from React to ASP.NET Core
+import swal from 'sweetalert';
+
+var APIURL = 'https://localhost:7270';
 
 const JWTLogin = () => {
     const navigate = useNavigate();
@@ -29,7 +28,8 @@ const JWTLogin = () => {
             onSubmit={async (values, { setSubmitting }) => {
                 setSubmitError(null);
                 try {
-                    const response = await axios.post(APIURL +'/api/Auth/login', {
+                    //Match C# model (Email, PasswordHash)
+                    const response = await axios.post(APIURL+'/api/Auth/login', {
                         EMAIL: values.email,
                         PASSWORDHASH: values.password,
                     });
