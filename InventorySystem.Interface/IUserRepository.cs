@@ -6,6 +6,7 @@ namespace InventorySystem.Interface
     {
         Task<int> InsertOrUpdateUserAsync(UserModel model);
         Task<UserModel?> GetUserByEmailAsync(string email);
+        Task<UserModel?> GetUserDetailsAsync();
     }
 
 }
