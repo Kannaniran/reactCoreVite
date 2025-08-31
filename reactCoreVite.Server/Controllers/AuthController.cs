@@ -145,5 +145,44 @@ namespace reactCoreVite.Server.Controllers
             });
         }
 
+        [HttpPost("updateuser/{userId}")]
+        public async Task<IActionResult> UpdateUser(int userId, [FromBody] UserModel model)
+        {
+            if (userId != model.USERID)
+            {
+                return BadRequest(new { message = "User ID mismatch" });
+            }
+
+            var objModel = new UserModel
+            {
+                USERID = userId,
+                USERNAME = model.USERNAME,
+                EMAIL = model.EMAIL,
+                MOBILE_NUMBER = model.MOBILE_NUMBER,
+                AADHAR_NUMBER = model.AADHAR_NUMBER,
+                ADDRESS = model.ADDRESS,
+                ISACTIVE = model.ISACTIVE
+            };
+
+            int newUserId = await _userRepository.InsertOrUpdateUserAsync(objModel);
+
+            if (newUserId <= 0)
+            {
+                return StatusCode(500, new
+                {
+                    messagecode = "500",
+                    message = "User creation failed"
+                });
+            }
+
+            return Ok(new
+            {
+                messagecode = "200",
+                message = "User created successfully",
+                userid = newUserId,
+                data = objModel
+            });
+        }
+
     }
 }
