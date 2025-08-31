@@ -36,39 +36,36 @@ namespace reactCoreVite.Server.Controllers
                 });
             }
 
-            if (model.EMAIL == "kk@gmail.com" && model.PASSWORDHASH == "1")
+
+            var user = await _userRepository.GetUserByEmailAsync(model.EMAIL);
+
+            if (user == null)
             {
-                //var user = await _userRepository.GetUserByEmailAsync(model.EMAIL);
-
-                //if (user == null)
-                //{
-                //    return Unauthorized(new
-                //    {
-                //        messagecode = "401",
-                //        message = "Invalid credentials"
-                //    });
-                //}
-
-                //// Verify password (compare plain password with hashed password from DB)
-                //var result = _passwordHasher.VerifyHashedPassword(user, user.PASSWORDHASH, model.PASSWORDHASH);
-
-                //if (result == PasswordVerificationResult.Failed)
-                //{
-                //    return Unauthorized(new
-                //    {
-                //        messagecode = "401",
-                //        message = "Invalid credentials"
-                //    });
-                //}
-
-                //// Send mail (login notification)
-                //await _emailService.SendEmailAsync(
-                //    user.EMAIL,
-                //    "Login Notification",
-                //    $"Hello {user.USERNAME},<br/>You have successfully logged in at {DateTime.Now}."
-                //);
-
+                return Unauthorized(new
+                {
+                    messagecode = "401",
+                    message = "Invalid credentials"
+                });
             }
+
+            // Verify password (compare plain password with hashed password from DB)
+            var result = _passwordHasher.VerifyHashedPassword(user, user.PASSWORDHASH, model.PASSWORDHASH);
+
+            if (result == PasswordVerificationResult.Failed)
+            {
+                return Unauthorized(new
+                {
+                    messagecode = "401",
+                    message = "Invalid credentials"
+                });
+            }
+
+            // Send mail (login notification)
+            //await _emailService.SendEmailAsync(
+            //    user.EMAIL,
+            //    "Login Notification",
+            //    $"Hello {user.USERNAME},<br/>You have successfully logged in at {DateTime.Now}."
+            //);
 
             return Ok(new
             {
@@ -79,10 +76,6 @@ namespace reactCoreVite.Server.Controllers
 
         }
 
-
-        /// <summary>
-        /// Create New User
-        /// </summary>
         [HttpPost("newusercreate")]   //Correct API route
         public async Task<IActionResult> NewUserCreate([FromBody] UserModel model)
         {
@@ -103,10 +96,8 @@ namespace reactCoreVite.Server.Controllers
                 AADHAR_NUMBER = model.AADHAR_NUMBER,
                 ADDRESS = model.ADDRESS,
                 ISACTIVE = 1,
-                PASSWORDHASH = model.PASSWORDHASH
-               // CREATEDAT = DateTime.UtcNow,
-               // UPDATEDAT = DateTime.UtcNow,
-               // USERROLEID = model.USERROLEID,
+                PASSWORDHASH = model.PASSWORDHASH,
+                USERROLEID = model.USERROLEID
             };
 
             // Hash password securely
@@ -126,10 +117,33 @@ namespace reactCoreVite.Server.Controllers
             return Ok(new
             {
                 messagecode = "200",
-                message = "User created successfully 🎉",
+                message = "User created successfully",
                 userid = newUserId,
                 data = objModel
             });
         }
+
+        [HttpGet("getdetails")]
+        public async Task<IActionResult> GetDetails()
+        {
+            var user = await _userRepository.GetUserDetailsAsync(); // fixed typo
+
+            if (user == null)
+            {
+                return StatusCode(401, new
+                {
+                    messagecode = "401",
+                    message = "Invalid credentials"
+                });
+            }
+
+            return Ok(new
+            {
+                messagecode = "200",
+                message = "Login Successfully..! ",
+                user  //returns the full user list
+            });
+        }
+
     }
 }
