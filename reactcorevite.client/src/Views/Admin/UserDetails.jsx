@@ -1,8 +1,8 @@
-﻿import React, { useState, useEffect } from 'react';
-import { Row, Col, Table, Button, Modal, Form } from 'react-bootstrap';
-import axios from 'axios';
-import swal from 'sweetalert';
-import Card from '../../components/Card/MainCard';
+﻿import React, { useState, useEffect } from "react";
+import { Row, Col, Table, Button, Modal, Form } from "react-bootstrap";
+import axios from "axios";
+import swal from "sweetalert";
+import Card from "../../components/Card/MainCard";
 
 const APIURL = "http://localhost:7270";
 
@@ -14,14 +14,10 @@ const UserDetails = () => {
     // Fetch user details from API
     const handleDetails = async () => {
         try {
-            const response = await axios.get("/api/auth/getdetails", {
-                headers: { "Content-Type": "application/json" }
-            });
+            const response = await axios.get("/api/auth/getdetails", { headers: { "Content-Type": "application/json" } });
             const result = response.data;
-            console.log("Returned from API:", result);
 
-            if (result.messagecode === "200")
-            {
+            if (result.messagecode === "200") {
                 const normalizedUsers = Array.isArray(result.user)
                     ? result.user
                     : result.user
@@ -31,53 +27,52 @@ const UserDetails = () => {
                             : [];
 
                 setUsers(normalizedUsers);
-                
             } else {
                 swal("Warning", result.message, "info");
             }
         } catch (error) {
-            if (error.response) {
-                swal("Failed", error.message, "error");
-            } else {
-                console.error(error);
-                swal("Error", "Server not responding", "error");
-            }
+            console.error(error);
+            swal("Error", "Failed to fetch users", "error");
         }
     };
 
-    //Auto load API when component mounts
+    // Auto load on mount
     useEffect(() => {
         handleDetails();
     }, []);
 
-    // 🔹 Close modal
-    const handleClose = () => setShow(false);
+    // Close modal
+    const handleClose = () => setShowModal(false);
 
-    // Handle Edit button
+    // Edit user
     const handleEdit = (user) => {
         setSelectedUser(user);
         setShowModal(true);
     };
 
-    // Handle save from modal (you can extend to call API update later)
+    // Save changes
     const handleSave = async () => {
         try {
-            await axios.put(
-                APIURL + `/api/auth/updateuser/${selectedUser.userid}`,
-                selectedUser,
-                { headers: { "Content-Type": "application/json" } }
-            );
+            //await axios.put( //post if your backend allows
+            //    `${APIURL}/api/auth/updateuser/${selectedUser.userId}`,
+            //    selectedUser,
+            //    { headers: { "Content-Type": "application/json" } }
+            //);
+
+            await axios.put(APIURL + '/api/auth/updateuser/' + selectedUser.userid,
+                selectedUser, { headers: { "Content-Type": "application/json" } });
 
             swal("Success", "User updated successfully", "success");
 
-            // Update table instantly
+            handleDetails(); // reload table after update
+            //setSelectedUser(null); // reset form
+
+            // Update table
             setUsers((prev) =>
-                prev.map((u) =>
-                    u.userid === selectedUser.userid ? selectedUser : u
-                )
+                prev.map((u) => (u.userid === selectedUser.userid ? selectedUser : u))
             );
 
-            setShow(false);
+            setShowModal(false);
         } catch (error) {
             swal("Error", "Failed to update user", "error");
         }
@@ -102,16 +97,16 @@ const UserDetails = () => {
                             <tbody>
                                 {users.length > 0 ? (
                                     users.map((user, index) => (
-                                        <tr key={user.userId}>
+                                        <tr key={user.userid || index}>
                                             <td>{index + 1}</td>
-                                            <td>{user.userName}</td>
+                                            <td>{user.username}</td>
                                             <td>{user.email}</td>
-                                            <td>{user.mobile_Number}</td>
+                                            <td>{user.mobilE_NUMBER}</td>
                                             <td>
-                                                {user.isActive ? (
-                                                    <span style={{ color: "green" }}>✔️</span>
+                                                {user.isactive === 1 ? (
+                                                    <i className="bi bi-check-circle-fill text-success"></i>
                                                 ) : (
-                                                    <span style={{ color: "red" }}>❌</span>
+                                                    <i className="bi bi-x-circle-fill text-danger"></i>
                                                 )}
                                             </td>
                                             <td>
@@ -215,7 +210,7 @@ const UserDetails = () => {
                                 <Form.Check
                                     type="checkbox"
                                     label="Active"
-                                    checked={!!selectedUser.isactive}
+                                    checked={selectedUser.isactive === 1}
                                     onChange={(e) =>
                                         setSelectedUser({
                                             ...selectedUser,
