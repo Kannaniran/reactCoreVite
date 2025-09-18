@@ -53,12 +53,6 @@ const UserDetails = () => {
     // Save changes
     const handleSave = async () => {
         try {
-            //await axios.put( //post if your backend allows
-            //    `${APIURL}/api/auth/updateuser/${selectedUser.userId}`,
-            //    selectedUser,
-            //    { headers: { "Content-Type": "application/json" } }
-            //);
-
             await axios.put(APIURL + '/api/auth/updateuser/' + selectedUser.userid,
                 selectedUser, { headers: { "Content-Type": "application/json" } });
 
